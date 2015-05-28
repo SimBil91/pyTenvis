@@ -4,8 +4,6 @@ from modules.TenvisMotor import TenvisMotor
 import sys
 from threading import Thread
 
-__version__=0.1
-
 class pyTenvis():
     def __init__(self,ip,usr,pwd):
         self.audio=TenvisAudio(ip)
@@ -15,7 +13,10 @@ class pyTenvis():
 if __name__ == "__main__":
     if len(sys.argv) != 4:
         print('Usage: '+sys.argv[0]+' <ip_address> <user> <password>') 
-        exit()
+        #exit()
+        domain='192.168.178.49'
+        usr='admin'
+        pwd='Penner12'
     else:
         domain=sys.argv[1]
         usr=sys.argv[2]

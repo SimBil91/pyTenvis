@@ -4,16 +4,20 @@ import time
 class TenvisMotor():
      
     uri = "http://{0}/cgi-bin/hi3510/ptzctrl.cgi?-step=0&-act=%s&speed=100"
-
+    uri_speed="http://{0}/cgi-bin/hi3510/param.cgi?cmd=setmotorattr&-panspeed=%s&-tiltspeed=%s"
+    
     def __init__(self, domain, user, pwd):
         self.uri = self.uri.format(domain)
+        self.uri_speed = self.uri_speed.format(domain)
         self.state = '00'
         self.auth_http(user,pwd)
+        self.speed=[-1,-1] # pan tilt speed [0-2], 0 fast
         
     def auth_http(self,user, pwd):
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
         # this creates a password manager
         passman.add_password(None, self.uri, user, pwd)
+        passman.add_password(None, self.uri_speed, user, pwd)
         authhandler = urllib2.HTTPBasicAuthHandler(passman)
         # create the AuthHandler
         opener = urllib2.build_opener(authhandler)
@@ -49,6 +53,7 @@ class TenvisMotor():
             result = stream.read()
             assert "ok" in result
             stream.close()
+            print(cmdstr)
         else:
             print('Movement not possible')
         
@@ -70,7 +75,31 @@ class TenvisMotor():
         self.send_command('down')
         time.sleep(amount)
         self.send_command('stop')
-        
+    def set_speed(self,speed):
+        if self.speed!=speed:
+            stream = urllib2.urlopen(self.uri_speed % tuple(speed))
+            result = stream.read()
+            assert "ok" in result
+            stream.close()
+            self.speed=speed
+            
+    def move_to_pos(self, current, goal,offset,speed):
+        self.set_speed(speed)
+        offset_y=float(goal[1])/goal[0]*offset
+        print(offset_y)
+        if current[0] > goal[0]+offset:
+            self.send_command('right')
+        elif current[0] < goal[0]-offset :
+            self.send_command('left')
+        elif current[1] < goal[1]-offset_y:
+            self.send_command('up')
+            self.send_command('stop')
+        elif current[1] > goal[1]+offset_y:
+            self.send_command('down')
+            self.send_command('stop')
+        else:
+            self.send_command('stop')
+            
     def shake_head(self,amount,repeat):
         self.send_command('left')
         time.sleep(amount)
@@ -96,7 +125,7 @@ if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode((320, 240))
     motor = TenvisMotor(domain,'admin','Penner12')
-    
+
     def checkKeys():
         keys = pygame.key.get_pressed()
         x = 0
@@ -109,6 +138,12 @@ if __name__ == "__main__":
             x = 1
         if keys [pygame.K_w]:
             y = 1
+        if keys [pygame.K_0]:
+            motor.set_speed([0,0])
+        if keys [pygame.K_1]:
+            motor.set_speed([1,1])
+        if keys [pygame.K_2]:
+            motor.set_speed([2,2])
             
         motor.move([x, y])
             
