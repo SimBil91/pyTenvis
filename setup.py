@@ -8,6 +8,6 @@ setup( name='pyTenvis',
     packages=find_packages(),
     include_package_data=True,
     url='https://github.com/SimBil91/pyTenvis',
-    download_url = 'https://github.com/SimBil91/pyTenvis/tarball/0.1',
+    download_url = 'https://github.com/SimBil91/pyTenvis/tarball/0.11',
     description='Library for Tenvis HD IPCAMs',
     keywords = ['TENVIS', 'IPCAM', 'library'])
