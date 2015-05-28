@@ -1,8 +1,7 @@
 from setuptools import setup, find_packages
-import pyTenvis
 
 setup( name='pyTenvis',
-    version=pyTenvis.__version__,
+    version=0.11,
     author = 'Simon Bilgeri',
     author_email = 'Simon.Bilgeri@tum.de',
     packages=find_packages(),
