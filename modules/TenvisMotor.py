@@ -53,7 +53,7 @@ class TenvisMotor():
             result = stream.read()
             assert "ok" in result
             stream.close()
-            print(cmdstr)
+            #print(cmdstr)
         else:
             print('Movement not possible')
         
@@ -65,6 +65,7 @@ class TenvisMotor():
         self.state = cmdstr
     
     def nod_head(self,amount,repeat):
+        self.set_speed((0,0))
         self.send_command('up')
         time.sleep(amount)
         for i in range(1,repeat):
@@ -86,7 +87,7 @@ class TenvisMotor():
     def move_to_pos(self, current, goal,offset,speed):
         self.set_speed(speed)
         offset_y=float(goal[1])/goal[0]*offset
-        print(offset_y)
+        #print(offset_y)
         if current[0] > goal[0]+offset:
             self.send_command('right')
         elif current[0] < goal[0]-offset :
@@ -101,6 +102,7 @@ class TenvisMotor():
             self.send_command('stop')
             
     def shake_head(self,amount,repeat):
+        set_speed((0,0))
         self.send_command('left')
         time.sleep(amount)
         for i in range(1,repeat):

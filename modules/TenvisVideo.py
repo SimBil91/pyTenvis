@@ -16,6 +16,7 @@ class TenvisVideo():
         self.motor=TenvisMotor(domain,'admin','Penner12')
         self.frame=None
         self.mutex=Lock()
+        self.stop=False
         
     def calc_histogramm(self,ROI,frame):
         self.extract_hue(frame)
@@ -85,11 +86,11 @@ class TenvisVideo():
             self.mutex.release()
             time.sleep(0.0001)
         
-    def show(self):
+    def follow(self,show):
         key=0
         framecount=0
         offset=80
-        while(chr(key & 255)!='q'):
+        while(chr(key & 255)!='q' and self.stop!=True):
             if self.frame!=None:
                 self.mutex.acquire()
                 frame=self.frame
@@ -102,18 +103,20 @@ class TenvisVideo():
                         self.calc_histogramm(faces[0],cv.fromarray(frame))
                         self.face_detected=1
                         center_point=(faces[0][0]+faces[0][2]/2,faces[0][1]+faces[0][3]/2)
-                        for x,y,w,h in faces:
-                            cv2.rectangle(numpy.asarray(frame), (x, y), (x+w, y+h), (0, 255, 0), 2)
-                            cv2.circle(numpy.asarray(frame), tuple(map(int,center_point)), 1, (0, 255, 0))
-                            cv2.circle(numpy.asarray(frame), (320,180), offset, (0, 0, 255))
+                        if show:
+                            for x,y,w,h in faces:
+                                cv2.rectangle(numpy.asarray(frame), (x, y), (x+w, y+h), (0, 255, 0), 2)
+                                cv2.circle(numpy.asarray(frame), tuple(map(int,center_point)), 1, (0, 255, 0))
+                                cv2.circle(numpy.asarray(frame), (320,180), offset, (0, 0, 255))
                     elif self.face_detected==1:
                         self.face_detected=0
                 if (self.face_detected==0):
                     frame,center_point=self.track_object(cv.fromarray(frame))
                     
                 if framecount%1==0 and 'center_point' in locals():
-                    self.motor.move_to_pos(center_point,[320,180],offset,[2,0])
-                cv2.imshow('FlatBuddy', numpy.asarray(frame))
+                    self.motor.move_to_pos(center_point,[320,180],offset,[2,2])
+                if show:
+                    cv2.imshow('FlatBuddy', numpy.asarray(frame))
                 framecount=framecount+1
                 key=cv2.waitKey(10)
                     

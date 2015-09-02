@@ -23,7 +23,7 @@ if __name__ == "__main__":
     IPCAM=pyTenvis(domain,usr,pwd)
     #IPCAM.audio.play_audio()
     t1 = Thread(target=IPCAM.video.pull_frames, args=())
-    t2 = Thread(target=IPCAM.video.show, args=())
+    t2 = Thread(target=IPCAM.video.follow, args=(False,))
     t1.start()
     t2.start()
     t2.join()
